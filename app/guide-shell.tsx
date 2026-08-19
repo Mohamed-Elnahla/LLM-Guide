@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { marked } from "marked";
 import { chapters } from "./chapters";
+import { chapterVideos } from "./video-guide";
 import { ThemeToggle } from "./theme-toggle";
 
 const sections = [...new Set(chapters.map((chapter) => chapter.section))];
 const hashSlug = () => typeof window === "undefined" ? "start" : window.location.hash.replace(/^#\/?/, "") || "start";
+const headingSlug = (text:string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "section";
 
 type VisualKind = "layers" | "tokens" | "attention" | "pipeline" | "alignment" | "adapter" | "quantization" | "cache" | "reasoning" | "agent" | "evaluation" | "ecosystem";
 
@@ -61,14 +63,24 @@ export function GuideShell() {
 
   const current = chapters.find((chapter) => chapter.slug === slug) ?? chapters[0];
   const currentIndex = chapters.indexOf(current);
-  const html = useMemo(() => {
-    const body = marked.parse(current.content, { async:false }) as string;
-    const video = current.video;
-    const embed = video.embedId
-      ? `<div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${video.embedId}?rel=0" title="${video.title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
-      : `<a class="video-link" href="${video.url}" target="_blank" rel="noreferrer"><span>Open a short explainer on YouTube ↗</span></a>`;
-    const card = `<aside class="video-card"><div class="video-copy"><div class="video-label"><span class="video-dot"></span> Watch this first <span class="video-duration">${video.duration}</span></div><h2>${video.title}</h2><p>${video.note}</p><a class="video-source" href="${video.url}" target="_blank" rel="noreferrer">YouTube source ↗</a></div>${embed}</aside>`;
-    return body.replace(/(<\/h1>)/, `$1${card}`);
+  const articleParts = useMemo(() => {
+    const videosByHeading = chapterVideos[current.slug] ?? {};
+    let body = marked.parse(current.content, { async:false }) as string;
+    body = body.replace(/<(h2|h3)>(.*?)<\/\1>/g, (match, _tag:string, rawTitle:string) => {
+      const title = rawTitle.replace(/<[^>]+>/g, "");
+      const cards = (videosByHeading[headingSlug(title)] ?? []).map((video) => {
+        const embedSrc = video.embedId
+          ? `https://www.youtube-nocookie.com/embed/${video.embedId}?rel=0`
+          : video.embedUrl;
+        const embed = embedSrc
+          ? `<div class="video-frame"><iframe src="${embedSrc}" title="${video.title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`
+          : `<a class="video-link" href="${video.url}" target="_blank" rel="noreferrer"><span>Open this focused video on YouTube ↗</span></a>`;
+        return `<aside class="video-card"><div class="video-copy"><div class="video-label"><span class="video-dot"></span> Focus video <span class="video-duration">${video.duration}</span></div><h4>${video.title}</h4><p>${video.note}</p><a class="video-source" href="${video.url}" target="_blank" rel="noreferrer">YouTube source ↗</a></div>${embed}</aside>`;
+      }).join("");
+      return `${match}${cards}`;
+    });
+    body = body.replace(/(<h1>.*?<\/h1>)/, "$1<!--VISUAL-->");
+    return { html:body };
   }, [current]);
   const matches = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -90,9 +102,9 @@ export function GuideShell() {
     article?.querySelectorAll("a").forEach((link) => {
       if ((link as HTMLAnchorElement).hostname && (link as HTMLAnchorElement).hostname !== window.location.hostname) { link.setAttribute("target", "_blank"); link.setAttribute("rel", "noreferrer"); }
     });
-    article?.querySelectorAll("h2, h3").forEach((heading) => { heading.id = heading.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "section"; });
+    article?.querySelectorAll("h2, h3").forEach((heading) => { heading.id = headingSlug(heading.textContent ?? ""); });
     window.scrollTo({ top:0, behavior:"instant" });
-  }, [html]);
+  }, [articleParts]);
 
   function navigate(nextSlug:string) { window.location.hash = `/${nextSlug}`; setSlug(nextSlug); setMenuOpen(false); }
 
@@ -115,7 +127,11 @@ export function GuideShell() {
 
     <main className="article-pane">
       <div className="article-meta"><span>Chapter {current.number}</span><span>{current.level}</span><button onClick={() => navigator.clipboard?.writeText(window.location.href)}>Copy link</button></div>
-      <article className="article-body"><VisualExplainer slug={current.slug} /><div dangerouslySetInnerHTML={{ __html:html }} /></article>
+      <article className="article-body">
+        <div dangerouslySetInnerHTML={{ __html:articleParts.html.split("<!--VISUAL-->")[0] }} />
+        <VisualExplainer slug={current.slug} />
+        <div dangerouslySetInnerHTML={{ __html:articleParts.html.split("<!--VISUAL-->")[1] ?? "" }} />
+      </article>
       <nav className="page-nav" aria-label="Previous and next chapters">
         {currentIndex > 0 ? <button onClick={() => navigate(chapters[currentIndex-1].slug)}><span>Previous</span><strong>← {chapters[currentIndex-1].title}</strong></button> : <span />}
         {currentIndex < chapters.length-1 ? <button className="next" onClick={() => navigate(chapters[currentIndex+1].slug)}><span>Next</span><strong>{chapters[currentIndex+1].title} →</strong></button> : <span />}
