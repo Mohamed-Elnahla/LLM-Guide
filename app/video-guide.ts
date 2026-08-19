@@ -1,31 +1,174 @@
 import type { Video } from "./chapters";
 
-// Embed the search itself so the card still has a playable video and thumbnail;
-// the source link exposes the full result set for readers who want to compare.
-const find = (title:string, duration:string, note:string, query:string): Video => ({
+const watch = (title: string, duration: string, note: string, id: string): Video => ({
   title,
   duration,
   note,
-  url:`https://www.youtube.com/results?search_query=${query}`,
-  embedUrl:`https://www.youtube-nocookie.com/embed?listType=search&list=${query}`,
+  url: `https://www.youtube.com/watch?v=${id}`,
+  embedId: id,
 });
-const watch = (title:string, duration:string, note:string, id:string): Video => ({title,duration,note,url:`https://www.youtube.com/watch?v=${id}`,embedId:id});
 
 // Exact Markdown subtitle slugs. Missing keys intentionally mean no video.
 export const chapterVideos: Record<string, Record<string, Video[]>> = {
-  start:{"the-entire-field-in-one-paragraph":[watch("But what is a GPT?","13 min","A visual map of the ideas in this guide.","wjZofJX0v4M")]},
-  "language-models":{"text-becomes-tokens":[find("How tokenization works","7 min","See how text becomes discrete IDs.","LLM+tokenization+tokens+explained")],"ids-become-vectors":[watch("Neural networks, from scratch","19 min","Build intuition for parameters and representations.","aircAruvnKk")],"the-objective":[find("Next-token prediction and cross entropy","9 min","Connect the training objective to probability.","next+token+prediction+cross+entropy+explained")],sampling:[find("How language-model sampling works","8 min","A focused look at temperature and probability.","language+model+sampling+temperature+explained")]},
-  transformer:{"why-attention-mattered":[watch("Attention in transformers, step by step","18 min","A visual walkthrough of information routing.","eMlx5fFNoYc")],"query-key-value":[find("Query, key, value attention","8 min","See the three roles in attention.","query+key+value+attention+transformer+explained")],"self-attention-and-masks":[find("Self-attention and causal masks","9 min","Understand how decoders hide future tokens.","self+attention+causal+mask+transformer")],"multi-head-attention":[find("Multi-head attention visually","8 min","See how heads specialize in parallel.","multi+head+attention+explained+visual")]},
-  architecture:{"2017–2019-pretraining-becomes-the-interface":[find("Transformer history BERT GPT","11 min","The shift that made pretraining the interface.","2017+Transformer+BERT+GPT+architecture+history")],"2024–2026-multimodal-moe-reasoning-and-action":[find("Mixture of experts and multimodal models","12 min","A bridge to MoE, multimodality, and action.","mixture+of+experts+multimodal+reasoning+models+explained")]},
-  pretraining:{"pretraining-is-compression-through-prediction":[find("How LLM pretraining works","10 min","See pretraining as compression through prediction.","large+language+model+pretraining+explained")],"scaling-laws":[find("Scaling laws for language models","9 min","Why data, parameters, and compute move together.","LLM+scaling+laws+parameters+data+compute")],"optimization-concepts":[watch("Gradient descent, visually explained","21 min","See how prediction errors become parameters.","IHZwWFHWa-w")]},
-  "post-training":{"stage-1-supervised-fine-tuning-sft":[find("Supervised fine-tuning SFT","8 min","The first post-training step: demonstrations.","supervised+fine+tuning+SFT+explained")],preferences:[find("RLHF human preferences","9 min","How preference data changes optimization.","RLHF+human+preference+data+explained")],"dpo-and-related-objectives":[find("Direct preference optimization DPO","9 min","A focused companion to the DPO objective.","direct+preference+optimization+DPO+explained")],"rl-with-verifiable-rewards":[find("Reinforcement learning with verifiable rewards","10 min","Why checkable outcomes create a new signal.","reinforcement+learning+verifiable+rewards+LLM")]},
-  "fine-tuning":{lora:[find("LoRA low-rank adaptation","9 min","Visualize the small trainable update.","LoRA+low+rank+adaptation+explained")],qlora:[find("QLoRA 4-bit fine-tuning","9 min","Connect quantization with adapters.","QLoRA+4-bit+fine+tuning+explained")],"dataset-design":[find("Fine-tuning dataset design","10 min","Examples, quality, coverage, and leakage.","LLM+fine+tuning+dataset+design+quality")]},
-  quantization:{"precision-is-a-systems-choice":[find("What is LLM quantization?","9 min","Lower precision, memory, and accuracy trade-offs.","LLM+quantization+precision+memory+explained")],"ptq-vs-qat":[find("PTQ versus QAT","9 min","Compare rounding and calibration.","PTQ+versus+QAT+quantization+explained")],"major-methods":[find("GPTQ AWQ SmoothQuant","11 min","Compare the main quantization families.","GPTQ+AWQ+SmoothQuant+explained")]},
-  inference:{"prefill-and-decode":[find("LLM prefill and decode","8 min","Separate prompt processing from decode.","LLM+prefill+decode+explained")],"the-kv-cache":[find("KV cache in transformers","9 min","Why serving keeps prior keys and values.","transformer+KV+cache+explained")],"speculative-decoding":[find("Speculative decoding","9 min","How a draft model accelerates a larger one.","speculative+decoding+large+language+models")]},
-  reasoning:{"chain-of-thought-prompting":[find("Chain-of-thought prompting","8 min","The prompting pattern and its limits.","chain+of+thought+prompting+explained")],"sampling-and-search":[find("LLM sampling and search","10 min","Compare candidates, search, and selection.","LLM+sampling+search+reasoning+explained")],"inference-time-scaling":[find("Inference-time scaling","10 min","Trading latency for harder problem solving.","inference-time+scaling+reasoning+models")]},
-  agents:{"retrieval-augmented-generation-rag":[find("Retrieval augmented generation RAG","10 min","How evidence retrieval wraps a model.","retrieval+augmented+generation+RAG+explained")],tools:[find("LLM tool use and function calling","9 min","How a model calls external capabilities.","LLM+tool+use+function+calling+explained")],agents:[find("AI agents planning tools memory","11 min","A concrete model–tool loop.","AI+agents+planning+tools+memory+explained")]},
-  evaluation:{"start-from-a-threat-model-and-use-case":[find("AI threat modeling and safety evaluation","10 min","Start with the failure that matters.","AI+threat+modeling+safety+evaluation+explained")],"evaluation-layers":[find("LLM evaluation layers","9 min","Separate component, behavior, system, and impact.","LLM+evaluation+layers+capability+behavior+system")],"benchmark-hazards":[find("AI benchmark contamination and saturation","9 min","Why benchmarks can mislead.","AI+benchmark+hazards+contamination+leakage")]},
-  research:{"how-to-read-a-paper":[find("How to read a machine learning paper","9 min","Turn papers into reproducible questions.","how+to+read+machine+learning+papers+research+workflow")]},
+  start: {
+    "the-entire-field-in-one-paragraph": [
+      watch("But what is a GPT? Visual intro to Transformers", "27 min", "A visual map of the key ideas behind generative language models.", "wjZofJX0v4M")
+    ]
+  },
+  "language-models": {
+    "text-becomes-tokens": [
+      watch("How Tokenization Works in LLMs", "7 min", "See how raw text is split into discrete token IDs.", "viZrOnJclY0"),
+      watch("Let's Build the GPT Tokenizer", "130 min", "Andrej Karpathy's comprehensive deep dive into Byte Pair Encoding (BPE) and tokenizers.", "zduSFxRajkE")
+    ],
+    "ids-become-vectors": [
+      watch("Neural Networks, From Scratch", "19 min", "Build intuition for parameters, layers, and vector representations.", "aircAruvnKk")
+    ],
+    "the-objective": [
+      watch("Neural Networks: Cross Entropy Loss", "6 min", "Connect the next-token prediction objective to probability and loss.", "6ArSys5qHAU")
+    ],
+    sampling: [
+      watch("Decoder-Only Transformers & Sampling", "15 min", "Understand how temperature and top-p sampling control generation.", "bQ5BoolX9Ag")
+    ]
+  },
+  transformer: {
+    "why-attention-mattered": [
+      watch("Attention in Transformers, Step by Step", "18 min", "A visual walkthrough of information routing across tokens.", "eMlx5fFNoYc")
+    ],
+    "query-key-value": [
+      watch("Attention Is All You Need — Math & Architecture", "179 min", "Umar Jamil's complete breakdown of Query, Key, and Value matrices.", "bCz4OMemCcA")
+    ],
+    "self-attention-and-masks": [
+      watch("Let's Build GPT: From Scratch, in Code", "117 min", "Andrej Karpathy builds causal self-attention and masking step by step.", "kCc8FmEb1nY")
+    ],
+    "multi-head-attention": [
+      watch("Coding a Transformer From Scratch in PyTorch", "120 min", "Umar Jamil implements multi-head self-attention and transformer blocks in code.", "ISNdQcPhsts")
+    ],
+    "positional-encoding-and-rotary-rope": [
+      watch("LLaMA Architecture, KV Cache & Rotary Positional Embedding (RoPE)", "125 min", "Deep dive into RoPE mathematics, RMSNorm, and grouped-query attention.", "Mn_9W1nCFLo")
+    ]
+  },
+  architecture: {
+    "2017–2019-pretraining-becomes-the-interface": [
+      watch("Encoder-Only Transformers (BERT) Explained", "14 min", "The architectural shift from encoder-only representations to decoder pretraining.", "zxQyTK8quyY")
+    ],
+    "2020–2023-scaling-instruction-tuning-and-rlhf": [
+      watch("Deep Dive into LLMs like ChatGPT", "215 min", "Andrej Karpathy's end-to-end breakdown of pretraining, fine-tuning, and alignment.", "7xTGNNLPyMI")
+    ],
+    "2024–2026-multimodal-moe-reasoning-and-action": [
+      watch("Mixture of Experts (MoE) & DeepSeek Architectures", "11 min", "How routing networks direct tokens to specialized expert sub-networks.", "4ucnsFBQmDA")
+    ],
+    "state-space-models-and-hybrids-mamba": [
+      watch("Mamba and S4 Explained", "110 min", "Architecture, parallel scan, kernel fusion, recurrent and convolution math.", "8Q_tqwpTpVU")
+    ]
+  },
+  pretraining: {
+    "pretraining-is-compression-through-prediction": [
+      watch("How Large Language Models Pretrain", "10 min", "See pretraining as compressing massive text data into model weights.", "5sLYAQS9sWQ")
+    ],
+    "scaling-laws": [
+      watch("LLM Scaling Laws Explained", "60 min", "Why parameters, dataset size, and compute must scale together predictably.", "zjkBMFhNj_g")
+    ],
+    "optimization-concepts": [
+      watch("Gradient Descent, Visually Explained", "21 min", "See how prediction errors steer parameters via backpropagation.", "IHZwWFHWa-w")
+    ],
+    "distributed-training-intuition": [
+      watch("Building a Distributed Training Framework from First Principles", "105 min", "Umar Jamil's guide to data parallelism, tensor parallelism, and distributed scaling.", "XoGvCBRnwLs")
+    ]
+  },
+  "post-training": {
+    "stage-1-supervised-fine-tuning-sft": [
+      watch("Supervised Fine-Tuning (SFT) for LLMs", "26 min", "The first post-training stage: adapting base models with curated demonstrations.", "eC6Hd1hFvos")
+    ],
+    preferences: [
+      watch("Reinforcement Learning from Human Feedback (RLHF), Clearly Explained", "16 min", "How human preference datasets and reward models shape assistant behavior.", "qPN_XZcJf_s")
+    ],
+    "dpo-and-related-objectives": [
+      watch("Direct Preference Optimization (DPO) Explained", "14 min", "Directly optimizing policy probabilities without training a separate reward model.", "vAmKB7iPkWw")
+    ],
+    "rl-with-verifiable-rewards": [
+      watch("DeepSeek-R1: Teaching AI to Reason With Verifiable Rewards", "18 min", "Why checkable outcomes (code/math execution) create clean learning signals.", "lLMCLDqdbl0")
+    ]
+  },
+  "fine-tuning": {
+    lora: [
+      watch("LoRA: Low-Rank Adaptation of LLMs", "55 min", "Visualize small trainable rank-decomposition matrices injected into frozen weights.", "PXWYUTMt-AU")
+    ],
+    qlora: [
+      watch("QLoRA: Efficient 4-bit Fine-Tuning", "11 min", "Combining 4-bit NormalFloat quantization with low-rank adapter updates.", "TPcXVJ1VSRI")
+    ],
+    "model-merging": [
+      watch("Model Merging & Mergekit Architecture", "25 min", "Combines multiple fine-tuned LLM checkpoints without retraining.", "IVDNhQIzyIY")
+    ]
+  },
+  quantization: {
+    "precision-is-a-systems-choice": [
+      watch("What is LLM Quantization?", "95 min", "Lower numeric precision, VRAM savings, and measured quality trade-offs.", "0VdNflU08yA")
+    ],
+    "ptq-vs-qat": [
+      watch("Post-Training Quantization vs Quantization-Aware Training", "12 min", "Comparing post-training calibration with training-time quantization.", "wIXr22QTEHg")
+    ],
+    "major-methods": [
+      watch("GPTQ, AWQ, and GGUF Quantization Compared", "18 min", "Comparing modern post-training quantization algorithms for LLMs.", "mNE_d-C82lI")
+    ]
+  },
+  inference: {
+    "prefill-and-decode": [
+      watch("LLM Inference: Prefill vs Decode Phases", "15 min", "Separating parallel prompt prefill from memory-bound token decoding.", "HRKFa8LIAQg")
+    ],
+    "the-kv-cache": [
+      watch("How KV Cache Speeds Up LLMs", "10 min", "Why serving systems cache key and value tensors to avoid quadratic recomputation.", "o0gkdZBtwEg")
+    ],
+    "kernels-and-batching": [
+      watch("FlashAttention Derived & Coded from First Principles", "100 min", "GPU memory hierarchy optimization and Triton kernel implementations.", "zy8ChVd_oTM")
+    ],
+    "speculative-decoding": [
+      watch("Speculative Decoding for Faster LLMs", "9 min", "How a smaller draft model accelerates generation for a larger target model.", "gBMO1JZav44")
+    ]
+  },
+  reasoning: {
+    "chain-of-thought-prompting": [
+      watch("Chain-of-Thought Prompting in Generative AI", "5 min", "How intermediate reasoning tokens improve performance on complex tasks.", "Fp-ue4UCE3s")
+    ],
+    "sampling-and-search": [
+      watch("Tree of Thoughts & Guided LLM Search", "10 min", "Generating multiple candidate reasoning paths and evaluating them with verifiers.", "ut5kp56wW_4")
+    ],
+    "inference-time-scaling": [
+      watch("DeepSeek-R1 & Test-Time Compute Scaling", "3 min", "Trading inference latency and compute for accuracy on hard problems.", "YwCLWZHm574")
+    ]
+  },
+  agents: {
+    "multimodal-models": [
+      watch("CLIP: Contrastive Language-Image Pretraining & Multimodality", "75 min", "Joint text-image embeddings, contrastive pretraining, and vision encoders.", "L3BTG8ETY_Y")
+    ],
+    "retrieval-augmented-generation-rag": [
+      watch("What is Retrieval-Augmented Generation (RAG)?", "7 min", "Grounding LLM generation in retrieved external documents.", "T-D1OfcDW1M")
+    ],
+    tools: [
+      watch("What is Tool Calling? Connecting LLMs to Your Data", "12 min", "How language models format structured function calls for external APIs.", "h8gMhXYAv1k")
+    ],
+    agents: [
+      watch("AI Agents & Agentic Reasoning Architecture", "25 min", "Structuring observation, decision, tool invocation, and memory loops.", "KrRD7r7y7NY")
+    ]
+  },
+  evaluation: {
+    "start-from-a-threat-model-and-use-case": [
+      watch("AI Threat Modeling & Red Teaming", "22 min", "Defining evaluation boundaries based on specific risk and failure scenarios.", "15sFfOLCLkc")
+    ],
+    "evaluation-layers": [
+      watch("LLM Evaluation Layers & Benchmarking", "14 min", "Disentangling component metrics from system-level and end-to-end behavior.", "kDY4TodQwbg")
+    ],
+    "benchmark-hazards": [
+      watch("LLM as a Judge & Benchmark Hazards", "16 min", "Why static benchmarks saturate and suffer from data leakage.", "trfUBIDeI1Y")
+    ],
+    interpretability: [
+      watch("Sparse Autoencoders & Mechanistic Interpretability", "45 min", "Extracting monosemantic features and understanding internal model representations.", "Tgq7E4YcPKQ")
+    ]
+  },
+  research: {
+    "how-to-read-a-paper": [
+      watch("How To Read Papers Fast & Effectively", "15 min", "A structured workflow for reading AI research papers efficiently.", "EXALI6jFu6E")
+    ]
+  }
 };
 
 const urls = Object.values(chapterVideos).flatMap((headings) => Object.values(headings).flatMap((videos) => videos.map((video) => video.url)));
