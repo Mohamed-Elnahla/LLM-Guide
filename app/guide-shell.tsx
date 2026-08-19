@@ -73,7 +73,7 @@ export function GuideShell() {
     <header className="app-header">
       <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle chapter navigation">{menuOpen ? "×" : "☰"}</button>
       <button className="brand brand-button" onClick={() => navigate("start")}><span className="brand-mark">L</span><span>LLM Field Guide</span></button>
-      <div className="header-meta"><span className="updated">Current through 19 Aug 2026</span><span className="pages-ready">GitHub Pages ready</span><ThemeToggle /></div>
+      <div className="header-meta"><span className="updated">Current through 19 Aug 2026</span><a className="author-link" href="https://www.linkedin.com/in/mohamed-el-nahla/" target="_blank" rel="noreferrer">Mohamed Elnahla ↗</a><ThemeToggle /></div>
     </header>
 
     <aside className={`sidebar ${menuOpen ? "open" : ""}`}>
